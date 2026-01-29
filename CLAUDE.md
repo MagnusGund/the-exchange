@@ -1,252 +1,180 @@
-# CLAUDE.md - AI Assistant Guide for factorio-mod
+# CLAUDE.md - AI Assistant Guide for Incremental Industrialist
 
 ## Repository Overview
 
-This is a Factorio mod repository in early development. Factorio mods extend the game's functionality using Lua scripts and JSON configuration files.
-
+**Mod Name:** Incremental Industrialist
+**Internal Name:** `incremental-industrialist`
 **Repository:** MagnusGund/factorio-mod
-**Current Status:** Initial setup - core mod files need to be created
+**Factorio Version:** 2.0+ (Space Age required)
+**Current Version:** 0.1.0
+
+An incremental game layer for Factorio Space Age. Import raw materials, fulfill production orders, earn credits, and unlock permanent factory upgrades.
 
 ## Project Structure
 
-### Current State
 ```
 factorio-mod/
-├── README.md          # Project documentation
-└── CLAUDE.md          # This file - AI assistant guide
-```
-
-### Target Factorio Mod Structure
-A complete Factorio mod should have:
-```
-factorio-mod/
-├── info.json          # Required: Mod metadata (name, version, dependencies)
-├── control.lua        # Runtime game logic and event handlers
-├── data.lua           # Prototype definitions (items, recipes, entities)
-├── data-updates.lua   # Late-stage prototype modifications
-├── data-final-fixes.lua # Final prototype adjustments
-├── settings.lua       # Mod settings definitions
-├── settings-updates.lua # Late-stage settings modifications
+├── info.json              # Mod metadata
+├── data.lua               # Data stage entry point
+├── control.lua            # Control stage entry point
+├── settings.lua           # Mod settings
+├── changelog.txt          # Version history
+├── README.md              # User documentation
+├── CLAUDE.md              # AI assistant guide (this file)
+├── prototypes/
+│   ├── trade-hub.lua      # Trade Hub entity/item/recipe
+│   ├── import-chest.lua   # Import Chest entity/item/recipe
+│   ├── export-chest.lua   # Export Chest entity/item/recipe
+│   ├── technologies.lua   # Research tree additions
+│   └── shortcuts.lua      # Toolbar shortcuts
+├── scripts/
+│   ├── trade-hub.lua      # Import/export processing logic
+│   ├── orders.lua         # Order system and rewards
+│   ├── upgrades.lua       # Upgrade definitions and application
+│   └── gui.lua            # User interface
 ├── locale/
 │   └── en/
-│       └── locale.cfg # English translations
-├── graphics/          # Sprites, icons, and images
-├── migrations/        # Save migration scripts
-├── changelog.txt      # Version history
-├── README.md          # Documentation
-└── CLAUDE.md          # AI assistant guide
+│       └── locale.cfg     # English translations
+└── graphics/              # (Placeholder for custom graphics)
+    ├── icons/
+    └── entity/
 ```
 
-## Factorio Modding Essentials
+## Core Systems
 
-### Required File: info.json
-```json
+### 1. Trade Hub System (`scripts/trade-hub.lua`)
+- Central entity for managing imports/exports
+- Tracks all placed import/export chests via `global.ii_data`
+- Processes imports on `on_nth_tick(30)` (every 0.5 seconds)
+- Outputs items directly to adjacent belts when chests are full
+
+### 2. Order System (`scripts/orders.lua`)
+- Progressive order templates (Tier 1-5 complexity)
+- Size tiers: small → medium → large → huge → massive
+- Orders scale based on player's completion history per item type
+- Rewards scale super-linearly to incentivize larger orders
+
+### 3. Upgrade System (`scripts/upgrades.lua`)
+- Categories: imports, exports, factory bonuses
+- Cost scaling with exponential formula: `base_cost * (scaling ^ level)`
+- Factory bonuses apply via Factorio's `force` modifiers
+- Robot upgrades gated behind `ii-robot-logistics-bonus` technology
+
+### 4. GUI System (`scripts/gui.lua`)
+- Toggle button in top-left corner
+- Tabbed interface: Orders, Upgrades, Imports, Statistics
+- Real-time progress bars for active orders
+- Number formatting with K/M/B suffixes
+
+## Key Data Structures
+
+### global.ii_data
+```lua
 {
-  "name": "mod-internal-name",
-  "version": "0.1.0",
-  "title": "Mod Display Name",
-  "author": "AuthorName",
-  "factorio_version": "1.1",
-  "dependencies": ["base >= 1.1.0"],
-  "description": "Brief mod description"
+  credits = 0,                    -- Current currency
+  import_chests = {},             -- unit_number -> chest data
+  export_chests = {},             -- unit_number -> chest data
+  active_orders = {},             -- order_id -> order data
+  completed_orders = {},          -- order_id -> completed order
+  order_progress = {},            -- item_name -> completion count
+  unlocked_order_tiers = {1},     -- Available order tiers
+  upgrades = {
+    imports = {},                 -- Unlocked import materials
+    import_tiers = {},            -- Upgraded material tiers
+    import_rate = 1.0,            -- Import speed multiplier
+    order_slots = 3,              -- Concurrent order limit
+    factory = {},                 -- Factory bonus values
+  },
+  upgrade_levels = {},            -- upgrade_name -> level
+  statistics = {},                -- Tracking metrics
 }
 ```
 
-### Load Order and Stages
-Factorio loads mods in three stages:
+## Naming Conventions
 
-1. **Settings Stage** (`settings.lua`, `settings-updates.lua`, `settings-final-fixes.lua`)
-   - Defines mod settings before data loading
-   - Access via `settings.startup`, `settings.runtime-global`, `settings.runtime-per-user`
+- **Prototypes:** Prefix with `ii-` (e.g., `ii-trade-hub`, `ii-import-chest`)
+- **Locale keys:** Prefix with `ii-` (e.g., `ii-gui.title`, `ii-messages.order-completed`)
+- **Global data:** Use `global.ii_data` as root namespace
+- **GUI elements:** Prefix names with `ii_` (e.g., `ii_main_frame`)
 
-2. **Data Stage** (`data.lua`, `data-updates.lua`, `data-final-fixes.lua`)
-   - Defines prototypes: items, recipes, entities, technologies
-   - No game state access - purely declarative
-   - Use `data:extend({...})` to add prototypes
+## Development Tasks
 
-3. **Control Stage** (`control.lua`)
-   - Runtime game logic
-   - Event handlers for game events
-   - Access to `game`, `script`, `remote`, `commands`, `rendering` globals
+### Adding New Importable Materials
+1. Add entry to `TradeHub.IMPORT_MATERIALS` in `scripts/trade-hub.lua`
+2. Specify tier, category, and prerequisites
+3. Update locale if needed
 
-### Key Globals by Stage
+### Adding New Order Templates
+1. Add entry to `Orders.ORDER_TEMPLATES` in `scripts/orders.lua`
+2. Specify item name, base amount, reward per item, and tier
+3. Tie to appropriate research in `Upgrades.on_research_finished()`
 
-**Data Stage:**
-- `data` - Prototype registration
-- `mods` - Table of loaded mod names/versions
-- `settings` - Startup settings values
+### Adding New Upgrades
+1. Add definition to `Upgrades.DEFINITIONS` in `scripts/upgrades.lua`
+2. Handle application in `Upgrades.apply_upgrade()`
+3. Add locale strings for description
+4. Update GUI if category doesn't exist
 
-**Control Stage:**
-- `game` - Game state access
-- `script` - Event registration
-- `remote` - Inter-mod communication
-- `commands` - Console commands
-- `rendering` - Drawing API
-- `global` - Persistent mod data (survives save/load)
+### Adding New Technologies
+1. Add prototype to `prototypes/technologies.lua`
+2. Handle unlock effects in `scripts/upgrades.lua` → `on_research_finished()`
+3. Add locale strings
 
-## Code Conventions
+## Testing Checklist
 
-### Lua Style Guidelines
-- Use `snake_case` for variables and functions
-- Use `PascalCase` for prototype type names
-- Use `UPPER_CASE` for constants
-- Prefix local functions with `local`
-- Use 2-space indentation (Factorio convention)
+- [ ] New game starts with correct initial state
+- [ ] Trade Hub can be crafted after green science research
+- [ ] Import chests spawn items at configured rate
+- [ ] Export chests correctly match items to active orders
+- [ ] Orders complete and grant correct rewards
+- [ ] Upgrades purchase and apply correctly
+- [ ] GUI displays accurate information
+- [ ] Save/load preserves all mod data
+- [ ] Multiplayer: All players see consistent state
 
-### Prototype Naming
-- Internal names: `mod-name-item-name` (kebab-case with mod prefix)
-- Avoid conflicts by prefixing all prototype names with mod identifier
-- Example: `my-mod-advanced-furnace`
+## Known Limitations (v0.1.0)
 
-### Event Handling Pattern
+1. **Placeholder graphics:** Currently using tinted base game icons
+2. **Import chest GUI:** No in-game GUI for selecting materials (requires console or API)
+3. **Assembler speed bonus:** Currently uses placeholder implementation
+4. **No Space Age materials:** Holmium, tungsten, etc. not yet in import tree
+
+## Future Enhancements
+
+- Custom graphics for all entities
+- In-game material selector for import chests
+- Space Age material imports tied to planet discovery
+- Achievement system for milestones
+- Sound effects for order completion
+- More granular factory bonuses (per-machine-type)
+
+## Code Style
+
+- 2-space indentation
+- `snake_case` for functions and variables
+- `UPPER_CASE` for constants
+- Explicit `local` for all local variables
+- Nil checks before accessing entity/player properties
+- Use `on_nth_tick` instead of `on_tick` for performance
+
+## Useful Commands (In-game Console)
+
 ```lua
--- control.lua
-local function on_player_created(event)
-  local player = game.get_player(event.player_index)
-  -- Handle player creation
-end
+-- Add credits for testing
+/c remote.call("incremental-industrialist", "add_credits", 10000)
 
-script.on_event(defines.events.on_player_created, on_player_created)
+-- View current credits
+/c game.print(remote.call("incremental-industrialist", "get_credits"))
+
+-- View upgrade state
+/c game.print(serpent.block(remote.call("incremental-industrialist", "get_upgrades")))
+
+-- Reload mods
+/c game.reload_mods()
 ```
 
-### Global Data Pattern
-```lua
--- Initialize global data structure
-script.on_init(function()
-  global.my_mod_data = global.my_mod_data or {}
-end)
+## Resources
 
-script.on_configuration_changed(function(data)
-  -- Handle mod updates and migrations
-  global.my_mod_data = global.my_mod_data or {}
-end)
-```
-
-## Development Workflow
-
-### Testing Locally
-1. Symlink or copy mod folder to Factorio mods directory:
-   - Windows: `%APPDATA%\Factorio\mods\`
-   - Linux: `~/.factorio/mods/`
-   - macOS: `~/Library/Application Support/factorio/mods/`
-2. Restart Factorio or use `/c game.reload_mods()` in console
-3. Check `factorio-current.log` for errors
-
-### Debugging
-- Use `log("message")` for logging to factorio-current.log
-- Use `game.print("message")` for in-game console output
-- Use `serpent.block(table)` to dump table contents
-- Enable `show-fps` and check performance with large mods
-
-### Version Bumping
-1. Update `version` in `info.json`
-2. Add entry to `changelog.txt`
-3. Test migrations if save format changed
-
-## Common Patterns
-
-### Adding an Item and Recipe
-```lua
--- data.lua
-data:extend({
-  {
-    type = "item",
-    name = "my-mod-special-item",
-    icon = "__my-mod__/graphics/icons/special-item.png",
-    icon_size = 64,
-    subgroup = "intermediate-product",
-    order = "a[my-mod]-a[special-item]",
-    stack_size = 100
-  },
-  {
-    type = "recipe",
-    name = "my-mod-special-item",
-    enabled = false,  -- Unlocked by technology
-    ingredients = {
-      {"iron-plate", 5},
-      {"copper-plate", 3}
-    },
-    result = "my-mod-special-item"
-  }
-})
-```
-
-### Modifying Existing Prototypes
-```lua
--- data-updates.lua
-local iron_plate = data.raw["item"]["iron-plate"]
-if iron_plate then
-  iron_plate.stack_size = 200
-end
-```
-
-### Remote Interface
-```lua
--- control.lua
-remote.add_interface("my-mod", {
-  get_data = function()
-    return global.my_mod_data
-  end,
-  set_value = function(key, value)
-    global.my_mod_data[key] = value
-  end
-})
-```
-
-## File Reference Paths
-
-In data stage files, use special path syntax:
-- `__mod-name__/path/to/file` - Reference files in another mod
-- `__base__/graphics/...` - Reference base game assets
-- `__core__/graphics/...` - Reference core game assets
-
-## Dependencies
-
-In `info.json`, specify dependencies:
-- `"mod-name"` - Required dependency
-- `"? mod-name"` - Optional dependency
-- `"(?) mod-name"` - Hidden optional dependency
-- `"! mod-name"` - Incompatible mod
-- `"~ mod-name"` - Does not affect load order
-- `">= 1.0.0"` - Version constraints
-
-## AI Assistant Guidelines
-
-### When Adding Features
-1. Check if similar functionality exists in base game or popular mods
-2. Follow established naming conventions with mod prefix
-3. Add localization strings for all user-facing text
-4. Consider save/load compatibility with `on_configuration_changed`
-5. Test with both new and existing saves
-
-### When Fixing Bugs
-1. Check `factorio-current.log` for error messages
-2. Verify prototype names match across data and control stages
-3. Ensure `global` table migrations handle all edge cases
-4. Test multiplayer compatibility if modifying player-specific data
-
-### When Reviewing Code
-1. Verify all prototype names are prefixed to avoid conflicts
-2. Check for proper nil handling (Factorio APIs often return nil)
-3. Ensure events are properly registered in `on_init` and `on_load`
-4. Validate that graphics paths exist and have correct dimensions
-
-### Performance Considerations
-- Avoid `on_tick` handlers when possible; use `on_nth_tick` instead
-- Cache frequently accessed data in local variables
-- Use entity filters in event handlers
-- Batch operations when modifying many entities
-
-## Useful Resources
-
-- [Factorio Modding API Documentation](https://lua-api.factorio.com/)
+- [Factorio 2.0 API Documentation](https://lua-api.factorio.com/latest/)
 - [Factorio Prototype Documentation](https://wiki.factorio.com/Prototype_definitions)
-- [Factorio Modding Forums](https://forums.factorio.com/viewforum.php?f=82)
-- [Factorio Mod Portal](https://mods.factorio.com/)
-
-## Git Workflow
-
-- Main development branch: As specified in task context
-- Commit messages: Use conventional commits (feat:, fix:, docs:, etc.)
-- Test changes locally before pushing
-- Update changelog.txt with user-facing changes
+- [Space Age Modding Guide](https://wiki.factorio.com/Tutorial:Space_age_modding)
