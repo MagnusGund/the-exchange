@@ -1,8 +1,11 @@
--- Incremental Industrialist - Data Stage
--- Defines all prototypes: entities, items, recipes, technologies
+-- Incremental Industrialist - Data Stage Entry Point
+-- Loads all prototype definitions
 
-require("prototypes.trade-hub")
+require("prototypes.planet")
+require("prototypes.items")
+require("prototypes.recipes")
 require("prototypes.import-chest")
 require("prototypes.export-chest")
+require("prototypes.data-terminal")
 require("prototypes.technologies")
 require("prototypes.shortcuts")

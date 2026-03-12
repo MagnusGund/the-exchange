@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "title": "Incremental Industrialist",
   "author": "MagnusGund",
+  "contact": "",
+  "homepage": "",
+  "description": "An incremental game layer for Factorio Space Age. Import raw materials, fulfill production orders, earn credits, and unlock permanent factory upgrades. Features The Exchange - a new trading planet.",
   "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.0.0",
-    "space-age >= 2.0.0"
-  ],
-  "description": "An incremental game layer for Factorio Space Age. Import raw materials, fulfill production orders, earn credits, and unlock permanent factory upgrades. Build increasingly complex production lines to tackle larger orders and dominate galactic trade!"
+    "base >= 2.0",
+    "space-age >= 2.0"
+  ]
 }
