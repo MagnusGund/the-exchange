@@ -1,275 +1,284 @@
--- Upgrade System
--- Manages purchasable upgrades and factory bonuses
+-- Incremental Industrialist - Upgrade System
+-- Defines available upgrades and their application
 
 local Upgrades = {}
 
 -- Upgrade definitions
 Upgrades.DEFINITIONS = {
-  -- Import rate upgrades
+  -- Import upgrades
   import_rate = {
-    name = "import-rate",
+    name = "import_rate",
     category = "imports",
-    max_level = 50,
-    base_cost = 100,
-    cost_scaling = 1.5,  -- Each level costs 1.5x more
-    effect_per_level = 0.1,  -- +10% per level
-    description = "upgrade-import-rate",
-  },
-
-  -- Order slot upgrades
-  order_slots = {
-    name = "order-slots",
-    category = "exports",
-    max_level = 10,
     base_cost = 500,
-    cost_scaling = 2.0,
-    effect_per_level = 1,  -- +1 slot per level
-    description = "upgrade-order-slots",
-  },
-
-  -- Factory bonuses
-  assembler_speed = {
-    name = "assembler-speed",
-    category = "factory",
-    max_level = 100,
-    base_cost = 200,
-    cost_scaling = 1.4,
-    effect_per_level = 0.02,  -- +2% per level
-    description = "upgrade-assembler-speed",
-    force_bonus = "laboratory-speed-modifier",  -- Placeholder, will use custom application
-  },
-
-  inserter_speed = {
-    name = "inserter-speed",
-    category = "factory",
-    max_level = 50,
-    base_cost = 150,
-    cost_scaling = 1.4,
-    effect_per_level = 0.02,  -- +2% per level
-    description = "upgrade-inserter-speed",
-  },
-
-  mining_productivity = {
-    name = "mining-productivity",
-    category = "factory",
-    max_level = 100,
-    base_cost = 300,
     cost_scaling = 1.5,
-    effect_per_level = 0.01,  -- +1% per level
-    description = "upgrade-mining-productivity",
-    force_bonus = "mining-drill-productivity-bonus",
-  },
-
-  lab_speed = {
-    name = "lab-speed",
-    category = "factory",
-    max_level = 50,
-    base_cost = 250,
-    cost_scaling = 1.5,
-    effect_per_level = 0.02,  -- +2% per level
-    description = "upgrade-lab-speed",
-    force_bonus = "laboratory-speed-modifier",
-  },
-
-  -- Robot bonuses (requires technology)
-  robot_cargo_size = {
-    name = "robot-cargo-size",
-    category = "factory",
     max_level = 20,
+    effect_per_level = 0.1, -- +10% import rate per level
+    description = "ii-upgrade.import-rate-description"
+  },
+  
+  -- Order upgrades
+  order_slots = {
+    name = "order_slots",
+    category = "orders",
     base_cost = 1000,
-    cost_scaling = 1.8,
-    effect_per_level = 1,  -- +1 cargo per level
-    description = "upgrade-robot-cargo",
-    force_bonus = "worker-robots-storage-bonus",
-    requires_tech = "ii-robot-logistics-bonus",
+    cost_scaling = 2.0,
+    max_level = 7,
+    effect_per_level = 1, -- +1 order slot per level
+    description = "ii-upgrade.order-slots-description"
   },
-
-  robot_speed = {
-    name = "robot-speed",
-    category = "factory",
-    max_level = 50,
-    base_cost = 800,
+  
+  order_reward_bonus = {
+    name = "order_reward_bonus",
+    category = "orders",
+    base_cost = 750,
     cost_scaling = 1.6,
-    effect_per_level = 0.05,  -- +5% per level
-    description = "upgrade-robot-speed",
-    force_bonus = "worker-robots-speed-modifier",
-    requires_tech = "ii-robot-logistics-bonus",
+    max_level = 25,
+    effect_per_level = 0.05, -- +5% reward bonus per level
+    description = "ii-upgrade.order-reward-bonus-description"
   },
+  
+  -- Factory bonuses (apply to force)
+  factory_assembler_speed = {
+    name = "factory_assembler_speed",
+    category = "factory",
+    base_cost = 2000,
+    cost_scaling = 1.8,
+    max_level = 50,
+    effect_per_level = 0.02, -- +2% assembler speed per level
+    description = "ii-upgrade.assembler-speed-description"
+  },
+  
+  factory_mining_speed = {
+    name = "factory_mining_speed",
+    category = "factory",
+    base_cost = 2000,
+    cost_scaling = 1.8,
+    max_level = 50,
+    effect_per_level = 0.02, -- +2% mining speed per level
+    description = "ii-upgrade.mining-speed-description"
+  },
+  
+  factory_research_speed = {
+    name = "factory_research_speed",
+    category = "factory",
+    base_cost = 3000,
+    cost_scaling = 1.9,
+    max_level = 50,
+    effect_per_level = 0.02, -- +2% research speed per level
+    description = "ii-upgrade.research-speed-description"
+  },
+  
+  -- Exchange Data upgrades
+  data_conversion_efficiency = {
+    name = "data_conversion_efficiency",
+    category = "exchange",
+    base_cost = 1500,
+    cost_scaling = 1.7,
+    max_level = 30,
+    effect_per_level = 0.05, -- -5% conversion cost per level
+    description = "ii-upgrade.data-conversion-description"
+  }
 }
 
--- Calculate cost for next level of an upgrade
-function Upgrades.get_cost(upgrade_name, current_level)
+-- Import material unlock costs
+Upgrades.IMPORT_UNLOCK_COSTS = {
+  -- Tier 2
+  ["iron-plate"] = 500,
+  ["copper-plate"] = 500,
+  ["steel-plate"] = 1000,
+  ["stone-brick"] = 300,
+  
+  -- Tier 3
+  ["iron-gear-wheel"] = 800,
+  ["copper-cable"] = 400,
+  ["electronic-circuit"] = 1500,
+  ["pipe"] = 600,
+  
+  -- Tier 4
+  ["advanced-circuit"] = 5000,
+  ["plastic-bar"] = 2000,
+  ["sulfur"] = 1500,
+  ["battery"] = 3000,
+  ["engine-unit"] = 4000,
+  
+  -- Tier 5
+  ["processing-unit"] = 15000,
+  ["electric-engine-unit"] = 8000,
+  ["low-density-structure"] = 10000,
+  ["rocket-fuel"] = 6000
+}
+
+-- Calculate upgrade cost
+function Upgrades.get_cost(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return nil end
-
-  current_level = current_level or 0
-  return math.floor(def.base_cost * math.pow(def.cost_scaling, current_level))
+  
+  local current_level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  if current_level >= def.max_level then return nil end
+  
+  return math.floor(def.base_cost * (def.cost_scaling ^ current_level))
 end
 
--- Get current level of an upgrade
+-- Get current upgrade level
 function Upgrades.get_level(upgrade_name)
-  local levels = global.ii_data.upgrade_levels or {}
-  return levels[upgrade_name] or 0
+  return global.ii_data.upgrade_levels[upgrade_name] or 0
+end
+
+-- Get upgrade effect value
+function Upgrades.get_effect(upgrade_name)
+  local def = Upgrades.DEFINITIONS[upgrade_name]
+  if not def then return 0 end
+  
+  local level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  return level * def.effect_per_level
 end
 
 -- Purchase an upgrade
 function Upgrades.purchase(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
-  if not def then return false, "invalid-upgrade" end
-
-  -- Check tech requirement
-  if def.requires_tech then
-    local force = game.forces["player"]
-    if not force.technologies[def.requires_tech] or not force.technologies[def.requires_tech].researched then
-      return false, "requires-technology"
-    end
-  end
-
-  -- Check max level
-  local current_level = Upgrades.get_level(upgrade_name)
+  if not def then return false, "Invalid upgrade" end
+  
+  local current_level = global.ii_data.upgrade_levels[upgrade_name] or 0
   if current_level >= def.max_level then
-    return false, "max-level"
+    return false, "Already at max level"
   end
-
-  -- Check cost
-  local cost = Upgrades.get_cost(upgrade_name, current_level)
-  if global.ii_data.credits < cost then
-    return false, "not-enough-credits"
+  
+  local cost = Upgrades.get_cost(upgrade_name)
+  if not cost then return false, "Cannot calculate cost" end
+  
+  local TradeHub = require("scripts.trade-hub")
+  if not TradeHub.spend_credits(cost) then
+    return false, "Insufficient credits"
   end
-
-  -- Purchase
-  global.ii_data.credits = global.ii_data.credits - cost
-  global.ii_data.upgrade_levels = global.ii_data.upgrade_levels or {}
+  
+  -- Apply upgrade
   global.ii_data.upgrade_levels[upgrade_name] = current_level + 1
-
-  -- Apply the upgrade effect
   Upgrades.apply_upgrade(upgrade_name)
-
+  
   return true
 end
 
--- Apply a specific upgrade's effect
+-- Apply upgrade effects
 function Upgrades.apply_upgrade(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return end
-
-  local level = Upgrades.get_level(upgrade_name)
+  
+  local level = global.ii_data.upgrade_levels[upgrade_name] or 0
   local effect = level * def.effect_per_level
-
-  -- Handle special upgrades
+  
   if upgrade_name == "import_rate" then
     global.ii_data.upgrades.import_rate = 1.0 + effect
-
+    
   elseif upgrade_name == "order_slots" then
     global.ii_data.upgrades.order_slots = 3 + level
-    -- Generate new orders if we have empty slots
-    local Orders = require("scripts.orders")
-    local current_orders = table_size(global.ii_data.active_orders)
-    local max_orders = global.ii_data.upgrades.order_slots
-    for i = current_orders + 1, max_orders do
-      Orders.generate_order()
-    end
-
-  elseif def.force_bonus then
-    -- Apply force bonus
-    local force = game.forces["player"]
-    if force then
-      if def.force_bonus == "mining-drill-productivity-bonus" then
-        force.mining_drill_productivity_bonus = effect
-      elseif def.force_bonus == "laboratory-speed-modifier" then
-        force.laboratory_speed_modifier = effect
-      elseif def.force_bonus == "worker-robots-storage-bonus" then
-        force.worker_robots_storage_bonus = math.floor(effect)
-      elseif def.force_bonus == "worker-robots-speed-modifier" then
-        force.worker_robots_speed_modifier = effect
+    
+  elseif upgrade_name == "order_reward_bonus" then
+    global.ii_data.upgrades.order_reward_bonus = 1.0 + effect
+    
+  elseif upgrade_name == "factory_assembler_speed" then
+    -- Apply to all forces
+    for _, force in pairs(game.forces) do
+      if force.name ~= "enemy" and force.name ~= "neutral" then
+        -- Note: In Factorio 2.0, this might need adjustment
+        -- This is a placeholder - actual implementation depends on API
+        force.manual_crafting_speed_modifier = effect
       end
     end
-  end
-
-  -- Store in upgrades table for reference
-  if def.category == "factory" then
-    global.ii_data.upgrades.factory[upgrade_name] = effect
+    global.ii_data.upgrades.factory.assembler_speed = effect
+    
+  elseif upgrade_name == "factory_mining_speed" then
+    for _, force in pairs(game.forces) do
+      if force.name ~= "enemy" and force.name ~= "neutral" then
+        force.manual_mining_speed_modifier = effect
+      end
+    end
+    global.ii_data.upgrades.factory.mining_speed = effect
+    
+  elseif upgrade_name == "factory_research_speed" then
+    for _, force in pairs(game.forces) do
+      if force.name ~= "enemy" and force.name ~= "neutral" then
+        force.laboratory_speed_modifier = effect
+      end
+    end
+    global.ii_data.upgrades.factory.research_speed = effect
+    
+  elseif upgrade_name == "data_conversion_efficiency" then
+    global.ii_data.upgrades.data_conversion_efficiency = effect
   end
 end
 
--- Apply all upgrades (called on config change)
-function Upgrades.apply_all_bonuses()
+-- Apply all upgrades (called on game load)
+function Upgrades.apply_all()
   for upgrade_name, _ in pairs(Upgrades.DEFINITIONS) do
-    if Upgrades.get_level(upgrade_name) > 0 then
+    if global.ii_data.upgrade_levels[upgrade_name] then
       Upgrades.apply_upgrade(upgrade_name)
     end
   end
 end
 
--- Check for technology unlocks
+-- Purchase import material unlock
+function Upgrades.unlock_import(material_name)
+  local cost = Upgrades.IMPORT_UNLOCK_COSTS[material_name]
+  if not cost then return false, "Invalid material or already available" end
+  
+  local TradeHub = require("scripts.trade-hub")
+  if TradeHub.is_import_unlocked(material_name) then
+    return false, "Already unlocked"
+  end
+  
+  if not TradeHub.spend_credits(cost) then
+    return false, "Insufficient credits"
+  end
+  
+  TradeHub.unlock_import(material_name)
+  return true
+end
+
+-- Handle research completion
 function Upgrades.on_research_finished(event)
   local research = event.research
-  if not research then return end
-
   local name = research.name
   local Orders = require("scripts.orders")
-
-  -- Trade operations unlocks basic trading
-  if name == "ii-trade-operations" then
-    -- Basic unlocks already handled by recipe unlocks
-  end
-
-  -- Advanced imports tech
-  if name == "ii-advanced-imports" then
-    -- Unlock plate-tier imports
-    global.ii_data.upgrades.import_tiers = global.ii_data.upgrades.import_tiers or {}
-    -- Players can now purchase plate imports in the upgrade shop
-  end
-
-  -- Robot logistics unlocks robot upgrades
-  if name == "ii-robot-logistics-bonus" then
-    -- Robot upgrades now available in shop (handled by requires_tech check)
-  end
-
-  -- Check for research that unlocks new order tiers
-  if name == "logistic-science-pack" then
+  local TradeHub = require("scripts.trade-hub")
+  
+  if name == "ii-advanced-orders" then
     Orders.unlock_tier(2)
-  elseif name == "chemical-science-pack" then
+    -- Unlock tier 2 imports
+    for material, data in pairs(TradeHub.IMPORT_MATERIALS) do
+      if data.tier == 2 then
+        for _, prereq in ipairs(data.prerequisites) do
+          if prereq == "ii-advanced-orders" then
+            TradeHub.unlock_import(material)
+          end
+        end
+      end
+    end
+    
+  elseif name == "ii-complex-orders" then
     Orders.unlock_tier(3)
-  elseif name == "production-science-pack" or name == "utility-science-pack" then
+    
+  elseif name == "ii-industrial-orders" then
     Orders.unlock_tier(4)
-  elseif name == "space-science-pack" then
+    
+  elseif name == "ii-mega-orders" then
     Orders.unlock_tier(5)
   end
 end
 
--- Get all available upgrades (for GUI)
-function Upgrades.get_available_upgrades()
-  local available = {}
-  local force = game.forces["player"]
+-- Get all upgrade definitions
+function Upgrades.get_definitions()
+  return Upgrades.DEFINITIONS
+end
 
+-- Get upgrades by category
+function Upgrades.get_by_category(category)
+  local result = {}
   for name, def in pairs(Upgrades.DEFINITIONS) do
-    local can_show = true
-
-    -- Check tech requirement for visibility
-    if def.requires_tech then
-      if not force.technologies[def.requires_tech] or not force.technologies[def.requires_tech].researched then
-        can_show = false
-      end
-    end
-
-    if can_show then
-      local level = Upgrades.get_level(name)
-      local cost = Upgrades.get_cost(name, level)
-      local at_max = level >= def.max_level
-
-      table.insert(available, {
-        name = name,
-        definition = def,
-        current_level = level,
-        cost = cost,
-        at_max = at_max,
-        can_afford = global.ii_data.credits >= cost,
-      })
+    if def.category == category then
+      result[name] = def
     end
   end
-
-  return available
+  return result
 end
 
 return Upgrades

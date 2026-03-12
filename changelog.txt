@@ -1,19 +1,20 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.0
-Date: 2026-01-29
+Date: 2026-03-12
   Features:
-    - Initial release of Incremental Industrialist
-    - Trade Hub entity for managing the incremental trade system
-    - Import Chests that generate resources and output to adjacent belts
-    - Export Chests that accept products to fulfill orders
-    - Order system with tiered complexity (small to massive orders)
-    - Progressive order unlocks based on research completion
-    - Currency system with natural inflation scaling
-    - Upgrade shop with categories:
-      - Import Upgrades (rate, material unlocks, tier upgrades)
-      - Export Upgrades (order slots)
-      - Factory Bonuses (assembler speed, inserter speed, mining productivity, lab speed)
-      - Robot Bonuses (cargo size, speed) - requires robotics research
-    - Full GUI with Orders, Upgrades, Imports, and Statistics tabs
-    - Localization support (English)
-    - Technology unlocks: Trade Operations (green science), Advanced Imports, Robot Logistics
+    - Initial release
+    - Added The Exchange planet - a new Space Age trading hub
+    - Import Chests: Generate materials from the Exchange network
+    - Export Chests: Fulfill orders to earn credits
+    - Data Terminal: Convert credits to Exchange Data
+    - Commerce Science Pack: New science pack for infinite research
+    - Order System: 5 complexity tiers, 5 size tiers with scaling rewards
+    - Upgrade System: Import rate, order slots, factory bonuses
+    - Full GUI with Orders, Upgrades, Imports, Exchange Data, and Statistics tabs
+    - Infinite research: Assembler speed, mining productivity, lab speed, robot cargo/speed, inserter capacity
+  Technologies:
+    - Incremental Commerce: Unlocks Import/Export chests
+    - Data Terminal: Unlocks Data Terminal and Data Matrix
+    - Commerce Science: Unlocks Commerce Science Pack
+    - Order tiers: Advanced, Complex, Industrial, and Mega orders
+    - Six infinite research technologies using Commerce Science
