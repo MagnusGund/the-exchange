@@ -1,11 +1,11 @@
 {
-  "name": "incremental-industrialist",
+  "name": "the-exchange",
   "version": "0.1.0",
-  "title": "Incremental Industrialist",
+  "title": "The Exchange",
   "author": "MagnusGund",
   "contact": "",
   "homepage": "",
-  "description": "An incremental game layer for Factorio Space Age. Import raw materials, fulfill production orders, earn credits, and unlock permanent factory upgrades. Features The Exchange - a new trading planet.",
+  "description": "A new planet mod for Factorio Space Age. Journey to The Exchange, an ancient megastructure beyond Aquilo, where you import materials, fulfill orders, earn credits, and unlock permanent factory-wide bonuses.",
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0",

@@ -1,4 +1,4 @@
--- Incremental Industrialist - Control Stage Entry Point
+-- The Exchange - Control Stage Entry Point
 -- Main runtime logic and event handlers
 
 local TradeHub = require("scripts.trade-hub")
@@ -150,7 +150,7 @@ local function on_gui_closed(event)
 end
 
 -- Remote interface for console commands
-remote.add_interface("incremental-industrialist", {
+remote.add_interface("the-exchange", {
   add_credits = function(amount)
     TradeHub.add_credits(amount)
   end,
