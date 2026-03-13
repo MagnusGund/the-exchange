@@ -1,18 +1,18 @@
-# CLAUDE.md - AI Assistant Guide for Incremental Industrialist
+# CLAUDE.md - AI Assistant Guide for The Exchange
 
 ## Repository Overview
 
-**Mod Name:** Incremental Industrialist
-**Internal Name:** `incremental-industrialist`
+**Mod Name:** The Exchange
+**Internal Name:** `the-exchange`
 **Factorio Version:** 2.0+ (Space Age required)
 **Current Version:** 0.1.0
 
-A new planet mod for Factorio Space Age. The Exchange is an incremental game layer where players import materials, fulfill orders, earn credits, and unlock permanent factory-wide bonuses through Commerce Science.
+A new planet mod for Factorio Space Age. The Exchange is an ancient megastructure beyond Aquilo where players import materials, fulfill orders, earn credits, and unlock permanent factory-wide bonuses through Commerce Science.
 
 ## Project Structure
 
 ```
-incremental-industrialist/
+the-exchange/
 ├── info.json              # Mod metadata (Space Age dependency)
 ├── data.lua               # Data stage entry point
 ├── control.lua            # Control stage entry point
@@ -92,13 +92,13 @@ Export Orders → Credits → Exchange Data → Data Matrix → Commerce Science
 
 ```lua
 -- Add credits
-/c remote.call("incremental-industrialist", "add_credits", 10000)
+/c remote.call("the-exchange", "add_credits", 10000)
 
 -- View credits
-/c game.print(remote.call("incremental-industrialist", "get_credits"))
+/c game.print(remote.call("the-exchange", "get_credits"))
 
 -- View orders
-/c game.print(serpent.block(remote.call("incremental-industrialist", "get_active_orders")))
+/c game.print(serpent.block(remote.call("the-exchange", "get_active_orders")))
 ```
 
 ## Code Style

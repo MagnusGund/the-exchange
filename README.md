@@ -1,6 +1,6 @@
-# Incremental Industrialist
+# The Exchange
 
-A new planet mod for Factorio Space Age that adds an incremental game layer. Journey to **The Exchange**, an ancient megastructure beyond Aquilo, where you import materials, fulfill orders, earn credits, and unlock permanent factory-wide bonuses through Commerce Science research.
+A new planet mod for Factorio Space Age. Journey to **The Exchange**, an ancient megastructure beyond Aquilo, where you import materials, fulfill orders, earn credits, and unlock permanent factory-wide bonuses through Commerce Science research.
 
 ---
 
@@ -292,9 +292,9 @@ Copy the mod folder to your Factorio mods directory:
 
 | Platform | Path |
 |----------|------|
-| Windows | `%APPDATA%\Factorio\mods\incremental-industrialist` |
-| Linux | `~/.factorio/mods/incremental-industrialist` |
-| macOS | `~/Library/Application Support/factorio/mods/incremental-industrialist` |
+| Windows | `%APPDATA%\Factorio\mods\the-exchange` |
+| Linux | `~/.factorio/mods/the-exchange` |
+| macOS | `~/Library/Application Support/factorio/mods/the-exchange` |
 
 ---
 
@@ -302,16 +302,16 @@ Copy the mod folder to your Factorio mods directory:
 
 ```lua
 -- Add credits
-/c remote.call("incremental-industrialist", "add_credits", 10000)
+/c remote.call("the-exchange", "add_credits", 10000)
 
 -- View current credits
-/c game.print(remote.call("incremental-industrialist", "get_credits"))
+/c game.print(remote.call("the-exchange", "get_credits"))
 
 -- View active orders
-/c game.print(serpent.block(remote.call("incremental-industrialist", "get_active_orders")))
+/c game.print(serpent.block(remote.call("the-exchange", "get_active_orders")))
 
 -- View statistics
-/c game.print(serpent.block(remote.call("incremental-industrialist", "get_statistics")))
+/c game.print(serpent.block(remote.call("the-exchange", "get_statistics")))
 ```
 
 ---
