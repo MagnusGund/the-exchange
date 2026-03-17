@@ -1,4 +1,4 @@
--- Incremental Industrialist - Technologies
+-- The Exchange - Technologies
 -- Research tree for unlocking mod features and infinite bonuses
 
 data:extend({
@@ -154,10 +154,10 @@ data:extend({
   
   -- Infinite technologies using Commerce Science
   
-  -- Assembler Speed Bonus (infinite)
+  -- Crafting Speed Bonus (infinite) - affects hand-crafting speed
   {
     type = "technology",
-    name = "ii-assembler-speed-bonus",
+    name = "ii-crafting-speed-bonus",
     icons = {
       {
         icon = "__base__/graphics/technology/automation-3.png",
@@ -172,8 +172,8 @@ data:extend({
     },
     effects = {
       {
-        type = "inserter-stack-size-bonus",
-        modifier = 0
+        type = "character-crafting-speed",
+        modifier = 0.05
       }
     },
     prerequisites = {"ii-commerce-science"},

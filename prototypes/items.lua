@@ -1,7 +1,7 @@
--- Incremental Industrialist - Items
+-- The Exchange - Items
 -- Exchange Data, Data Matrix, Commerce Science Pack
 
--- Item subgroup for Incremental Industrialist items
+-- Item subgroup for The Exchange items
 data:extend({
   {
     type = "item-subgroup",

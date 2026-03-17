@@ -1,4 +1,4 @@
--- Incremental Industrialist - Mod Settings
+-- The Exchange - Mod Settings
 
 data:extend({
   {
@@ -57,7 +57,7 @@ data:extend({
     type = "double-setting",
     name = "ii-data-terminal-scaling-factor",
     setting_type = "runtime-global",
-    default_value = 1.05,
+    default_value = 1.02,
     minimum_value = 1.0,
     maximum_value = 2.0,
     order = "c-b"

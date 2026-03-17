@@ -1,4 +1,4 @@
--- Incremental Industrialist - Data Stage Entry Point
+-- The Exchange - Data Stage Entry Point
 -- Loads all prototype definitions
 
 require("prototypes.planet")

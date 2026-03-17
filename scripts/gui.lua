@@ -1,4 +1,4 @@
--- Incremental Industrialist - GUI System
+-- The Exchange - GUI System
 -- Main interface for managing orders, upgrades, imports, and statistics
 
 local GUI = {}

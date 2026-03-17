@@ -1,4 +1,4 @@
--- Incremental Industrialist - Export Chest
+-- The Exchange - Export Chest
 -- Accepts products to fulfill orders and earn credits
 
 data:extend({

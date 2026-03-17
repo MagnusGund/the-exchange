@@ -1,4 +1,4 @@
--- Incremental Industrialist - The Exchange Planet
+-- The Exchange - Planet Definition
 
 local planet_map_gen = require("__space-age__/prototypes/planet/planet-map-gen")
 

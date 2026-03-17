@@ -1,4 +1,4 @@
--- Incremental Industrialist - Upgrade System
+-- The Exchange - Upgrade System
 -- Defines available upgrades and their application
 
 local Upgrades = {}
@@ -36,46 +36,15 @@ Upgrades.DEFINITIONS = {
     effect_per_level = 0.05, -- +5% reward bonus per level
     description = "ii-upgrade.order-reward-bonus-description"
   },
-  
-  -- Factory bonuses (apply to force)
-  factory_assembler_speed = {
-    name = "factory_assembler_speed",
-    category = "factory",
-    base_cost = 2000,
-    cost_scaling = 1.8,
-    max_level = 50,
-    effect_per_level = 0.02, -- +2% assembler speed per level
-    description = "ii-upgrade.assembler-speed-description"
-  },
-  
-  factory_mining_speed = {
-    name = "factory_mining_speed",
-    category = "factory",
-    base_cost = 2000,
-    cost_scaling = 1.8,
-    max_level = 50,
-    effect_per_level = 0.02, -- +2% mining speed per level
-    description = "ii-upgrade.mining-speed-description"
-  },
-  
-  factory_research_speed = {
-    name = "factory_research_speed",
-    category = "factory",
-    base_cost = 3000,
-    cost_scaling = 1.9,
-    max_level = 50,
-    effect_per_level = 0.02, -- +2% research speed per level
-    description = "ii-upgrade.research-speed-description"
-  },
-  
+
   -- Exchange Data upgrades
   data_conversion_efficiency = {
     name = "data_conversion_efficiency",
     category = "exchange",
     base_cost = 1500,
     cost_scaling = 1.7,
-    max_level = 30,
-    effect_per_level = 0.05, -- -5% conversion cost per level
+    max_level = 20,
+    effect_per_level = 0.03, -- ~3% cheaper per level (multiplicative: 0.97^level)
     description = "ii-upgrade.data-conversion-description"
   }
 }
@@ -174,34 +143,7 @@ function Upgrades.apply_upgrade(upgrade_name)
     
   elseif upgrade_name == "order_reward_bonus" then
     global.ii_data.upgrades.order_reward_bonus = 1.0 + effect
-    
-  elseif upgrade_name == "factory_assembler_speed" then
-    -- Apply to all forces
-    for _, force in pairs(game.forces) do
-      if force.name ~= "enemy" and force.name ~= "neutral" then
-        -- Note: In Factorio 2.0, this might need adjustment
-        -- This is a placeholder - actual implementation depends on API
-        force.manual_crafting_speed_modifier = effect
-      end
-    end
-    global.ii_data.upgrades.factory.assembler_speed = effect
-    
-  elseif upgrade_name == "factory_mining_speed" then
-    for _, force in pairs(game.forces) do
-      if force.name ~= "enemy" and force.name ~= "neutral" then
-        force.manual_mining_speed_modifier = effect
-      end
-    end
-    global.ii_data.upgrades.factory.mining_speed = effect
-    
-  elseif upgrade_name == "factory_research_speed" then
-    for _, force in pairs(game.forces) do
-      if force.name ~= "enemy" and force.name ~= "neutral" then
-        force.laboratory_speed_modifier = effect
-      end
-    end
-    global.ii_data.upgrades.factory.research_speed = effect
-    
+
   elseif upgrade_name == "data_conversion_efficiency" then
     global.ii_data.upgrades.data_conversion_efficiency = effect
   end

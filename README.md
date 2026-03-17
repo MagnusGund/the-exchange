@@ -55,7 +55,7 @@ The Exchange is not a natural planet - it's a massive **space station** or **meg
 │                    │                                                │
 │                    ▼                                                │
 │         ┌─────────────────────┐                                     │
-│         │  COMMERCE SCIENCE   │◄─── + Processing Units              │
+│         │  COMMERCE SCIENCE   │◄─── + Advanced Circuits             │
 │         │       PACK          │                                     │
 │         └──────────┬──────────┘                                     │
 │                    │                                                │
@@ -74,7 +74,7 @@ The Exchange is not a natural planet - it's a massive **space station** or **meg
 ### Import Chest (Blue Tint)
 Generates resources automatically and outputs them to adjacent belts.
 
-- **Base Rate**: 4 items/second per chest
+- **Base Rate**: 2 items/second per chest (1 item every 30 ticks)
 - **Upgradeable**: Import rate can be increased via upgrades
 - **Material Tiers**: Progress from ores → plates → intermediates
 - **No Inserters Needed**: Items flow directly to belts
@@ -103,53 +103,57 @@ Orders are the primary way to earn credits. Complete orders to unlock larger ver
 
 | Tier | Products | Examples |
 |------|----------|----------|
-| **Tier 1** | Basic | Iron Gear Wheels, Copper Cable, Pipes, Belts |
-| **Tier 2** | Intermediate | Electronic Circuits, Inserters, Splitters |
-| **Tier 3** | Advanced | Advanced Circuits, Engine Units, Fast Belts |
-| **Tier 4** | High-Tech | Processing Units, Flying Robot Frames, LDS |
-| **Tier 5** | End-Game | Rocket Control Units, Satellites, Beacons |
+| **Tier 1** | Basic | Iron Plates, Copper Plates, Iron Gear Wheels, Stone Bricks |
+| **Tier 2** | Intermediate | Electronic Circuits, Steel Plates, Transport Belts |
+| **Tier 3** | Advanced | Advanced Circuits, Engine Units, Batteries, Fast Inserters |
+| **Tier 4** | High-Tech | Processing Units, Flying Robot Frames, LDS, Rocket Fuel |
+| **Tier 5** | End-Game | Rocket Control Units, Modules, Solar Panels, Accumulators |
 
 ### Size Tiers & Scaling
 
 | Size | Quantity Multiplier | Reward Bonus |
 |------|---------------------|--------------|
 | **Small** | 1x | 1.0x |
-| **Medium** | 5x | 1.2x (+20%) |
-| **Large** | 20x | 1.5x (+50%) |
-| **Huge** | 100x | 2.0x (+100%) |
-| **Massive** | 500x | 3.0x (+200%) |
+| **Medium** | 2.5x | 1.2x (+20%) |
+| **Large** | 5x | 1.5x (+50%) |
+| **Huge** | 10x | 2.0x (+100%) |
+| **Massive** | 25x | 3.0x (+200%) |
 
-**Progressive Scaling**: Each time you complete an order for an item type, the next order for that item will be larger with better rewards. This creates natural progression as your factory scales up.
+**Progressive Scaling**: Each time you complete an order for an item type, the next order for that item will be 10% larger. Rewards scale proportionally, creating natural progression as your factory scales up.
 
-### Example Order Rewards
+### Example Order Rewards (Base, before progression scaling)
 
 | Order | Small | Medium | Large | Huge | Massive |
 |-------|-------|--------|-------|------|---------|
-| 100 Gears | 50 cr | 300 cr | 1,500 cr | 10,000 cr | 75,000 cr |
-| 100 Circuits | 200 cr | 1,200 cr | 6,000 cr | 40,000 cr | 300,000 cr |
-| 20 Proc Units | 1,000 cr | 6,000 cr | 30,000 cr | 200,000 cr | 1,500,000 cr |
+| Gears (base 50) | 150 cr | 450 cr | 1,125 cr | 3,000 cr | 11,250 cr |
+| E-Circuits (base 50) | 250 cr | 750 cr | 1,875 cr | 5,000 cr | 18,750 cr |
+| Proc Units (base 10) | 500 cr | 1,500 cr | 3,750 cr | 10,000 cr | 37,500 cr |
 
 ---
 
 ## Import Material Progression
 
-Materials are unlocked in tiers. Higher tiers require prerequisites.
+Materials are unlocked in tiers via research and credit purchases.
 
 ```
-TIER 0 (Free)           TIER 1 (Unlock)         TIER 2 (Unlock)
-─────────────           ───────────────         ───────────────
-Iron Ore         ───►   Iron Plate       ───►   Iron Gear Wheel
-Copper Ore       ───►   Copper Plate     ───►   Copper Cable
-Stone            ───►   Stone Brick             Electronic Circuit
-Coal                    Steel Plate              (requires plate + cable)
+TIER 1 (Free)           TIER 2 (Research)       TIER 3 (Research + Credits)
+─────────────           ────────────────        ───────────────────────────
+Iron Ore                Iron Plate              Iron Gear Wheel
+Copper Ore              Copper Plate            Copper Cable
+Stone                   Steel Plate             Electronic Circuit
+Coal                    Stone Brick             Pipe
+Wood
 
-TIER 3 (Unlock)         TIER 4 (Unlock)
-───────────────         ───────────────
-Advanced Circuit ───►   Processing Unit
-Plastic Bar             Low Density Structure
-Sulfur                  Rocket Fuel
-Battery
+TIER 4 (Research + Credits)    TIER 5 (Research + Credits)
+──────────────────────────     ──────────────────────────
+Advanced Circuit               Processing Unit
+Plastic Bar                    Electric Engine Unit
+Sulfur                         Low Density Structure
+Battery                        Rocket Fuel
+Engine Unit
 ```
+
+Tier 2 imports are auto-unlocked when researching Advanced Orders. Tiers 3-5 require both the matching research AND a one-time credit purchase per material (300-15,000 credits).
 
 ---
 
@@ -158,20 +162,20 @@ Battery
 ### Crafting Chain
 
 ```
-Exchange Data (buy with credits)
+Exchange Data (buy with credits at Data Terminal)
        │
        ▼
    ┌───────────────────────────────────┐
-   │  2x Exchange Data                 │
-   │  5x Electronic Circuit            │──► Data Matrix
-   │  10x Copper Cable                 │
+   │  5x Exchange Data                 │
+   │  2x Electronic Circuit            │──► Data Matrix (5 sec)
+   │  1x Iron Plate                    │
    └───────────────────────────────────┘
        │
        ▼
    ┌───────────────────────────────────┐
-   │  1x Data Matrix                   │
-   │  1x Processing Unit               │──► Commerce Science Pack
-   │  2x Advanced Circuit              │
+   │  3x Data Matrix                   │
+   │  1x Advanced Circuit              │──► Commerce Science Pack (10 sec)
+   │  10x Copper Cable                 │
    └───────────────────────────────────┘
 ```
 
@@ -179,53 +183,46 @@ Exchange Data (buy with credits)
 
 All bonuses apply **globally** across all your planets!
 
-| Technology | Bonus per Level | Effect |
-|------------|-----------------|--------|
-| **Assembler Speed** | +2% | Faster crafting on all assemblers |
-| **Mining Productivity** | +2% | More ore from every mining operation |
-| **Lab Speed** | +2% | Faster research everywhere |
-| **Robot Cargo Capacity** | +1 | Robots carry more items |
-| **Robot Speed** | +3% | Faster robot movement |
-| **Inserter Capacity** | +1 | Higher inserter stack size |
+| Technology | Bonus per Level | Base Cost | Effect |
+|------------|-----------------|-----------|--------|
+| **Crafting Speed** | +5% | 100 packs | Faster hand-crafting speed |
+| **Mining Productivity** | +2% | 150 packs | More ore from mining drills |
+| **Lab Speed** | +5% | 100 packs | Faster research everywhere |
+| **Robot Cargo Capacity** | +1 | 200 packs | Robots carry more items |
+| **Robot Speed** | +5% | 200 packs | Faster robot movement |
+| **Inserter Capacity** | +1 | 150 packs | Higher inserter stack size |
 
 ### Cost Formula
 
-Research costs scale with level: `100 × (Level ^ 1.5)` science packs
+Research costs scale with level: `Base × (Level ^ 1.5)` science packs
 
-This creates the classic incremental game progression where early levels are cheap but later levels require significant investment.
+Each infinite research requires Commerce Science Packs plus one additional science type (Production or Utility). Robot and Inserter technologies require their vanilla research chain to be completed first.
 
 ---
 
 ## Technology Tree
 
 ```
-Space Science Pack
+Automation 2
         │
         ▼
-Planet Discovery: The Exchange
+Incremental Commerce ──────────────────► Advanced Orders (Tier 2)
+(Import/Export Chests)                          │
+        │                                       ▼
+        ▼                                Complex Orders (Tier 3)
+Data Terminal ◄── Advanced Circuits            │
+(Data Terminal + Data Matrix)                   ▼
+        │                              Industrial Orders (Tier 4)
+        ▼                                       │
+Commerce Science ◄── Production Science         ▼
+(Commerce Science Pack)                  Mega Orders (Tier 5)
         │
-        ▼
-Trade Protocols I ─────────────────────────────────────┐
-(Import/Export Chests)                                 │
-        │                                              │
-        ▼                                              ▼
-Trade Protocols II ◄──────────────────────── Construction Robotics
-(Data Terminal, Plate Imports)                         │
-        │                                              │
-        ▼                                              ▼
-Trade Protocols III                          Robot Logistics Bonus
-(Data Matrix crafting)                                 │
-        │                                              │
-        ▼                                              │
-Commerce Science ◄─────────────────────────────────────┘
-(Science Pack crafting)
-        │
-        ├──► Assembler Speed I-∞
+        ├──► Crafting Speed I-∞
         ├──► Mining Productivity I-∞
         ├──► Lab Speed I-∞
-        ├──► Robot Cargo I-∞ (requires Robot Logistics)
-        ├──► Robot Speed I-∞ (requires Robot Logistics)
-        └──► Inserter Capacity I-∞
+        ├──► Robot Cargo I-∞ (requires Worker Robot Storage 3)
+        ├──► Robot Speed I-∞ (requires Worker Robot Speed 6)
+        └──► Inserter Capacity I-∞ (requires Inserter Capacity 7)
 ```
 
 ---
@@ -236,19 +233,22 @@ Exchange Data is the **credit sink** that drives the incremental loop.
 
 ### Pricing Model
 
-The cost of Exchange Data increases as you purchase more:
+The cost of Exchange Data increases exponentially as you purchase more:
 
-| Purchases | Cost per Unit | Cumulative Spent |
-|-----------|---------------|------------------|
-| 1-10 | 10 cr | 100 cr |
-| 11-20 | 15 cr | 250 cr |
-| 21-30 | 20 cr | 450 cr |
-| 31-40 | 25 cr | 700 cr |
-| ... | +50% per tier | Scales infinitely |
+| Purchase # | Cost per Unit |
+|------------|---------------|
+| 1st | 100 cr |
+| 10th | 119 cr |
+| 50th | 263 cr |
+| 100th | 692 cr |
+| 200th | 4,799 cr |
+| 500th | 1,926,440 cr |
 
-**Formula**: `Base Cost × (1 + (Purchases ÷ 10) × 0.5)`
+**Formula**: `floor(Base Cost × 1.02^purchases)`
 
-This creates natural pacing - early Commerce Science is cheap, but sustained research requires massive export operations.
+The default base cost is 100 credits with 2% scaling per purchase (configurable in mod settings). The Data Conversion Efficiency upgrade reduces costs multiplicatively.
+
+This creates natural pacing - early Commerce Science is affordable, but sustained research requires progressively larger export operations.
 
 ---
 
@@ -259,7 +259,7 @@ Toggle with the toolbar button or shortcut.
 | Tab | Purpose |
 |-----|---------|
 | **Orders** | View active orders, progress bars, rewards. Reroll for credits. |
-| **Upgrades** | Purchase import rate, order slots, and other improvements |
+| **Upgrades** | Purchase import rate, order slots, reward bonus, and data conversion efficiency |
 | **Imports** | See available materials by tier |
 | **Exchange Data** | Purchase data, view current pricing |
 | **Statistics** | Track total earned, spent, orders completed |
@@ -268,10 +268,10 @@ Toggle with the toolbar button or shortcut.
 
 ## Getting Started
 
-1. **Research** "Planet Discovery: The Exchange" (requires Space Science)
+1. **Research** "Incremental Commerce" (requires Automation 2)
 2. **Travel** to The Exchange (long journey from Nauvis - beyond Aquilo!)
 3. **Bootstrap** using the small native ore patches
-4. **Research** "Trade Protocols I" to unlock Import/Export Chests
+4. **Build** Import/Export Chests (unlocked by Incremental Commerce research)
 5. **Build** Import Chests and select materials to generate
 6. **Process** raw materials into products
 7. **Export** via Export Chests to fulfill orders

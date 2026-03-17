@@ -1,4 +1,4 @@
--- Incremental Industrialist - Order System
+-- The Exchange - Order System
 -- Progressive order templates with scaling rewards
 
 local Orders = {}
@@ -153,10 +153,12 @@ end
 function Orders.complete_order(order_id)
   local order = global.ii_data.active_orders[order_id]
   if not order then return false end
-  
-  -- Award credits
+
+  -- Award credits (apply order reward bonus if upgraded)
   local TradeHub = require("scripts.trade-hub")
-  TradeHub.add_credits(order.reward)
+  local reward_multiplier = global.ii_data.upgrades.order_reward_bonus or 1.0
+  local final_reward = math.floor(order.reward * reward_multiplier)
+  TradeHub.add_credits(final_reward)
   
   -- Update statistics
   global.ii_data.statistics.total_orders_completed = 
@@ -173,7 +175,7 @@ function Orders.complete_order(order_id)
   
   -- Notify players
   for _, player in pairs(game.players) do
-    player.print({"ii-messages.order-completed", order.item, order.amount, order.reward})
+    player.print({"ii-messages.order-completed", order.item, order.amount, final_reward})
   end
   
   return true
