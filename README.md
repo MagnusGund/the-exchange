@@ -203,7 +203,10 @@ Each infinite research requires Commerce Science Packs plus one additional scien
 ## Technology Tree
 
 ```
-Automation 2
+Space Science Pack
+        │
+        ▼
+Planet Discovery: The Exchange ─────────► (unlocks travel)
         │
         ▼
 Incremental Commerce ──────────────────► Advanced Orders (Tier 2)
@@ -268,10 +271,10 @@ Toggle with the toolbar button or shortcut.
 
 ## Getting Started
 
-1. **Research** "Incremental Commerce" (requires Automation 2)
+1. **Research** "Planet Discovery: The Exchange" (requires Space Science)
 2. **Travel** to The Exchange (long journey from Nauvis - beyond Aquilo!)
 3. **Bootstrap** using the small native ore patches
-4. **Build** Import/Export Chests (unlocked by Incremental Commerce research)
+4. **Research** "Incremental Commerce" to unlock Import/Export Chests
 5. **Build** Import Chests and select materials to generate
 6. **Process** raw materials into products
 7. **Export** via Export Chests to fulfill orders

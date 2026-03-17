@@ -2,6 +2,31 @@
 -- Research tree for unlocking mod features and infinite bonuses
 
 data:extend({
+  -- Planet Discovery: The Exchange (unlocks travel to the planet)
+  {
+    type = "technology",
+    name = "ii-planet-discovery",
+    icon = "__base__/graphics/technology/rocket-silo.png",
+    icon_size = 256,
+    effects = {
+      {type = "unlock-space-location", space_location = "ii-the-exchange"}
+    },
+    prerequisites = {"space-science-pack"},
+    unit = {
+      count = 500,
+      ingredients = {
+        {"automation-science-pack", 1},
+        {"logistic-science-pack", 1},
+        {"chemical-science-pack", 1},
+        {"production-science-pack", 1},
+        {"utility-science-pack", 1},
+        {"space-science-pack", 1}
+      },
+      time = 60
+    },
+    order = "z-a-0"
+  },
+
   -- Base technology: Incremental Commerce (unlocks Import/Export chests)
   {
     type = "technology",
@@ -12,7 +37,7 @@ data:extend({
       {type = "unlock-recipe", recipe = "ii-import-chest"},
       {type = "unlock-recipe", recipe = "ii-export-chest"}
     },
-    prerequisites = {"automation-2"},
+    prerequisites = {"ii-planet-discovery"},
     unit = {
       count = 100,
       ingredients = {
