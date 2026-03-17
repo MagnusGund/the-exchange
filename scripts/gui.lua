@@ -269,11 +269,10 @@ function GUI.populate_upgrades_tab(container)
   local Upgrades = require("scripts.upgrades")
   
   -- Group by category
-  local categories = {"imports", "orders", "factory", "exchange"}
+  local categories = {"imports", "orders", "exchange"}
   local category_names = {
     imports = {"ii-gui.category-imports"},
     orders = {"ii-gui.category-orders"},
-    factory = {"ii-gui.category-factory"},
     exchange = {"ii-gui.category-exchange"}
   }
   
