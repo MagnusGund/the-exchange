@@ -44,8 +44,8 @@ TradeHub.IMPORT_MATERIALS = {
 
 -- Initialize trade hub data structure
 function TradeHub.init_global()
-  if not global.ii_data then
-    global.ii_data = {
+  if not storage.ii_data then
+    storage.ii_data = {
       credits = settings.global["ii-starting-credits"].value or 100,
       import_chests = {},
       export_chests = {},
@@ -80,7 +80,7 @@ function TradeHub.register_import_chest(entity)
   if not entity or not entity.valid then return end
   
   local unit_number = entity.unit_number
-  global.ii_data.import_chests[unit_number] = {
+  storage.ii_data.import_chests[unit_number] = {
     entity = entity,
     material = nil,
     amount_per_tick = settings.global["ii-base-import-amount"].value or 1,
@@ -93,7 +93,7 @@ function TradeHub.register_export_chest(entity)
   if not entity or not entity.valid then return end
   
   local unit_number = entity.unit_number
-  global.ii_data.export_chests[unit_number] = {
+  storage.ii_data.export_chests[unit_number] = {
     entity = entity,
     target_order = nil
   }
@@ -104,7 +104,7 @@ function TradeHub.register_data_terminal(entity)
   if not entity or not entity.valid then return end
   
   local unit_number = entity.unit_number
-  global.ii_data.data_terminals[unit_number] = {
+  storage.ii_data.data_terminals[unit_number] = {
     entity = entity,
     active = true
   }
@@ -115,23 +115,23 @@ function TradeHub.unregister_entity(entity)
   if not entity then return end
   
   local unit_number = entity.unit_number
-  if global.ii_data.import_chests[unit_number] then
-    global.ii_data.import_chests[unit_number] = nil
-  elseif global.ii_data.export_chests[unit_number] then
-    global.ii_data.export_chests[unit_number] = nil
-  elseif global.ii_data.data_terminals[unit_number] then
-    global.ii_data.data_terminals[unit_number] = nil
+  if storage.ii_data.import_chests[unit_number] then
+    storage.ii_data.import_chests[unit_number] = nil
+  elseif storage.ii_data.export_chests[unit_number] then
+    storage.ii_data.export_chests[unit_number] = nil
+  elseif storage.ii_data.data_terminals[unit_number] then
+    storage.ii_data.data_terminals[unit_number] = nil
   end
 end
 
 -- Set material for an import chest
 function TradeHub.set_import_material(unit_number, material_name)
-  local chest_data = global.ii_data.import_chests[unit_number]
+  local chest_data = storage.ii_data.import_chests[unit_number]
   if not chest_data then return false, "Chest not found" end
   
   -- Validate material is unlocked
   local is_unlocked = false
-  for _, unlocked in ipairs(global.ii_data.unlocked_imports) do
+  for _, unlocked in ipairs(storage.ii_data.unlocked_imports) do
     if unlocked == material_name then
       is_unlocked = true
       break
@@ -150,9 +150,9 @@ end
 function TradeHub.process_imports()
   local tick_rate = settings.global["ii-import-tick-rate"].value or 30
   local base_amount = settings.global["ii-base-import-amount"].value or 1
-  local rate_multiplier = global.ii_data.upgrades.import_rate or 1.0
+  local rate_multiplier = storage.ii_data.upgrades.import_rate or 1.0
   
-  for unit_number, chest_data in pairs(global.ii_data.import_chests) do
+  for unit_number, chest_data in pairs(storage.ii_data.import_chests) do
     if chest_data.entity and chest_data.entity.valid and chest_data.material then
       local material = chest_data.material
       local material_info = TradeHub.IMPORT_MATERIALS[material]
@@ -165,15 +165,15 @@ function TradeHub.process_imports()
         if inventory and inventory.can_insert({name = material, count = amount}) then
           local inserted = inventory.insert({name = material, count = amount})
           if inserted > 0 then
-            global.ii_data.statistics.total_items_imported = 
-              global.ii_data.statistics.total_items_imported + inserted
+            storage.ii_data.statistics.total_items_imported = 
+              storage.ii_data.statistics.total_items_imported + inserted
           end
         end
       end
     else
       -- Clean up invalid chests
       if not chest_data.entity or not chest_data.entity.valid then
-        global.ii_data.import_chests[unit_number] = nil
+        storage.ii_data.import_chests[unit_number] = nil
       end
     end
   end
@@ -183,7 +183,7 @@ end
 function TradeHub.process_exports()
   local Orders = require("scripts.orders")
   
-  for unit_number, chest_data in pairs(global.ii_data.export_chests) do
+  for unit_number, chest_data in pairs(storage.ii_data.export_chests) do
     if chest_data.entity and chest_data.entity.valid then
       local inventory = chest_data.entity.get_inventory(defines.inventory.chest)
       if inventory then
@@ -194,7 +194,7 @@ function TradeHub.process_exports()
           local item_count = item_stack.count
           
           -- Find matching active orders
-          for order_id, order in pairs(global.ii_data.active_orders) do
+          for order_id, order in pairs(storage.ii_data.active_orders) do
             if order.item == item_name and order.delivered < order.amount then
               local needed = order.amount - order.delivered
               local to_take = math.min(needed, item_count)
@@ -202,8 +202,8 @@ function TradeHub.process_exports()
               local removed = inventory.remove({name = item_name, count = to_take})
               if removed > 0 then
                 order.delivered = order.delivered + removed
-                global.ii_data.statistics.total_items_exported = 
-                  global.ii_data.statistics.total_items_exported + removed
+                storage.ii_data.statistics.total_items_exported = 
+                  storage.ii_data.statistics.total_items_exported + removed
                 
                 -- Check if order is complete
                 if order.delivered >= order.amount then
@@ -218,7 +218,7 @@ function TradeHub.process_exports()
     else
       -- Clean up invalid chests
       if not chest_data.entity or not chest_data.entity.valid then
-        global.ii_data.export_chests[unit_number] = nil
+        storage.ii_data.export_chests[unit_number] = nil
       end
     end
   end
@@ -229,29 +229,29 @@ function TradeHub.process_data_terminals()
   local base_cost = settings.global["ii-data-terminal-conversion-rate"].value or 100
   local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.02
 
-  for unit_number, terminal_data in pairs(global.ii_data.data_terminals) do
+  for unit_number, terminal_data in pairs(storage.ii_data.data_terminals) do
     if terminal_data.entity and terminal_data.entity.valid and terminal_data.active then
       local entity = terminal_data.entity
       local output = entity.get_output_inventory()
 
       if output and output.can_insert({name = "ii-exchange-data", count = 1}) then
         -- Calculate current cost (apply conversion efficiency as multiplicative discount)
-        local conversions = global.ii_data.data_terminal_conversions or 0
-        local efficiency_level = global.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
+        local conversions = storage.ii_data.data_terminal_conversions or 0
+        local efficiency_level = storage.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
         local efficiency_discount = 0.97 ^ efficiency_level -- ~3% cheaper per level, multiplicative
         local cost = math.max(1, math.floor(base_cost * (scaling ^ conversions) * efficiency_discount))
         
-        if global.ii_data.credits >= cost then
-          global.ii_data.credits = global.ii_data.credits - cost
+        if storage.ii_data.credits >= cost then
+          storage.ii_data.credits = storage.ii_data.credits - cost
           output.insert({name = "ii-exchange-data", count = 1})
-          global.ii_data.data_terminal_conversions = conversions + 1
-          global.ii_data.statistics.total_exchange_data_created = 
-            global.ii_data.statistics.total_exchange_data_created + 1
+          storage.ii_data.data_terminal_conversions = conversions + 1
+          storage.ii_data.statistics.total_exchange_data_created = 
+            storage.ii_data.statistics.total_exchange_data_created + 1
         end
       end
     else
       if not terminal_data.entity or not terminal_data.entity.valid then
-        global.ii_data.data_terminals[unit_number] = nil
+        storage.ii_data.data_terminals[unit_number] = nil
       end
     end
   end
@@ -261,28 +261,28 @@ end
 function TradeHub.get_conversion_cost()
   local base_cost = settings.global["ii-data-terminal-conversion-rate"].value or 100
   local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.02
-  local conversions = global.ii_data.data_terminal_conversions or 0
-  local efficiency_level = global.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
+  local conversions = storage.ii_data.data_terminal_conversions or 0
+  local efficiency_level = storage.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
   local efficiency_discount = 0.97 ^ efficiency_level
   return math.max(1, math.floor(base_cost * (scaling ^ conversions) * efficiency_discount))
 end
 
 -- Add credits
 function TradeHub.add_credits(amount)
-  global.ii_data.credits = global.ii_data.credits + amount
-  global.ii_data.statistics.total_credits_earned = 
-    global.ii_data.statistics.total_credits_earned + amount
+  storage.ii_data.credits = storage.ii_data.credits + amount
+  storage.ii_data.statistics.total_credits_earned = 
+    storage.ii_data.statistics.total_credits_earned + amount
 end
 
 -- Get credits
 function TradeHub.get_credits()
-  return global.ii_data.credits
+  return storage.ii_data.credits
 end
 
 -- Spend credits
 function TradeHub.spend_credits(amount)
-  if global.ii_data.credits >= amount then
-    global.ii_data.credits = global.ii_data.credits - amount
+  if storage.ii_data.credits >= amount then
+    storage.ii_data.credits = storage.ii_data.credits - amount
     return true
   end
   return false
@@ -294,19 +294,19 @@ function TradeHub.unlock_import(material_name)
     return false, "Invalid material"
   end
   
-  for _, unlocked in ipairs(global.ii_data.unlocked_imports) do
+  for _, unlocked in ipairs(storage.ii_data.unlocked_imports) do
     if unlocked == material_name then
       return false, "Already unlocked"
     end
   end
   
-  table.insert(global.ii_data.unlocked_imports, material_name)
+  table.insert(storage.ii_data.unlocked_imports, material_name)
   return true
 end
 
 -- Check if a material is unlocked
 function TradeHub.is_import_unlocked(material_name)
-  for _, unlocked in ipairs(global.ii_data.unlocked_imports) do
+  for _, unlocked in ipairs(storage.ii_data.unlocked_imports) do
     if unlocked == material_name then
       return true
     end
@@ -316,22 +316,22 @@ end
 
 -- Get all unlocked imports
 function TradeHub.get_unlocked_imports()
-  return global.ii_data.unlocked_imports
+  return storage.ii_data.unlocked_imports
 end
 
 -- Get import chest data by unit number
 function TradeHub.get_import_chest(unit_number)
-  return global.ii_data.import_chests[unit_number]
+  return storage.ii_data.import_chests[unit_number]
 end
 
 -- Get all import chests
 function TradeHub.get_all_import_chests()
-  return global.ii_data.import_chests
+  return storage.ii_data.import_chests
 end
 
 -- Get all export chests
 function TradeHub.get_all_export_chests()
-  return global.ii_data.export_chests
+  return storage.ii_data.export_chests
 end
 
 return TradeHub

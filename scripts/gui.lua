@@ -90,7 +90,7 @@ function GUI.create_main_frame(player)
   local credits_label = header_flow.add{
     type = "label",
     name = GUI.NAMES.credits_label,
-    caption = format_number(global.ii_data.credits)
+    caption = format_number(storage.ii_data.credits)
   }
   credits_label.style.font = "default-bold"
   credits_label.style.font_color = {r = 1, g = 0.85, b = 0.1}
@@ -181,7 +181,7 @@ function GUI.populate_orders_tab(container)
     local info_flow = order_flow.add{type = "flow", direction = "vertical"}
     info_flow.add{
       type = "label",
-      caption = {"ii-gui.order-info", game.item_prototypes[order.item].localised_name, order.amount}
+      caption = {"ii-gui.order-info", prototypes.item[order.item].localised_name, order.amount}
     }
     
     -- Progress bar
@@ -223,7 +223,7 @@ function GUI.populate_orders_tab(container)
   -- New orders section
   container.add{type = "label", caption = {"ii-gui.available-orders"}, style = "heading_2_label"}
   
-  local max_orders = global.ii_data.upgrades.order_slots or 3
+  local max_orders = storage.ii_data.upgrades.order_slots or 3
   if active_count < max_orders then
     -- Generate some order options
     for i = 1, 3 do
@@ -235,7 +235,7 @@ function GUI.populate_orders_tab(container)
         
         order_flow.add{type = "sprite", sprite = "item/" .. order.item}
         
-        local item_name = game.item_prototypes[order.item]
+        local item_name = prototypes.item[order.item]
         if item_name then
           order_flow.add{
             type = "label",
@@ -311,7 +311,7 @@ function GUI.populate_upgrades_tab(container)
           type = "button",
           name = "ii_buy_upgrade_" .. name,
           caption = {"ii-gui.buy-for", format_number(cost)},
-          enabled = global.ii_data.credits >= cost
+          enabled = storage.ii_data.credits >= cost
         }
       else
         upgrade_flow.add{
@@ -341,7 +341,7 @@ function GUI.populate_imports_tab(container)
     mat_flow.style.vertical_align = "center"
     mat_flow.add{type = "sprite", sprite = "item/" .. material}
     
-    local item = game.item_prototypes[material]
+    local item = prototypes.item[material]
     if item then
       mat_flow.add{type = "label", caption = item.localised_name}
     end
@@ -360,7 +360,7 @@ function GUI.populate_imports_tab(container)
       
       mat_flow.add{type = "sprite", sprite = "item/" .. material}
       
-      local item = game.item_prototypes[material]
+      local item = prototypes.item[material]
       if item then
         mat_flow.add{type = "label", caption = item.localised_name}
       end
@@ -369,7 +369,7 @@ function GUI.populate_imports_tab(container)
         type = "button",
         name = "ii_unlock_import_" .. material,
         caption = {"ii-gui.unlock-for", format_number(cost)},
-        enabled = global.ii_data.credits >= cost
+        enabled = storage.ii_data.credits >= cost
       }
     end
   end
@@ -390,7 +390,7 @@ function GUI.populate_imports_tab(container)
     
     if chest_data.material then
       chest_flow.add{type = "sprite", sprite = "item/" .. chest_data.material}
-      local item = game.item_prototypes[chest_data.material]
+      local item = prototypes.item[chest_data.material]
       if item then
         chest_flow.add{type = "label", caption = item.localised_name}
       end
@@ -402,7 +402,7 @@ function GUI.populate_imports_tab(container)
     local dropdown_items = {}
     local selected_index = 1
     for i, mat in ipairs(unlocked) do
-      local item = game.item_prototypes[mat]
+      local item = prototypes.item[mat]
       if item then
         table.insert(dropdown_items, item.localised_name)
         if mat == chest_data.material then
@@ -444,7 +444,7 @@ function GUI.populate_exchange_tab(container)
   -- Total conversions
   container.add{
     type = "label",
-    caption = {"ii-gui.total-conversions", global.ii_data.data_terminal_conversions or 0}
+    caption = {"ii-gui.total-conversions", storage.ii_data.data_terminal_conversions or 0}
   }
   
   container.add{type = "line"}.style.top_margin = 8
@@ -459,21 +459,21 @@ function GUI.populate_exchange_tab(container)
     type = "button",
     name = "ii_convert_1",
     caption = {"ii-gui.convert-amount", 1},
-    enabled = global.ii_data.credits >= cost
+    enabled = storage.ii_data.credits >= cost
   }
   
   convert_flow.add{
     type = "button",
     name = "ii_convert_10",
     caption = {"ii-gui.convert-amount", 10},
-    enabled = global.ii_data.credits >= cost * 10
+    enabled = storage.ii_data.credits >= cost * 10
   }
   
   convert_flow.add{
     type = "button",
     name = "ii_convert_100",
     caption = {"ii-gui.convert-amount", 100},
-    enabled = global.ii_data.credits >= cost * 100
+    enabled = storage.ii_data.credits >= cost * 100
   }
   
   container.add{type = "line"}.style.top_margin = 8
@@ -481,7 +481,7 @@ function GUI.populate_exchange_tab(container)
   -- Data terminals info
   container.add{type = "label", caption = {"ii-gui.data-terminals"}, style = "heading_2_label"}
   
-  local terminals = global.ii_data.data_terminals or {}
+  local terminals = storage.ii_data.data_terminals or {}
   local terminal_count = 0
   for _ in pairs(terminals) do
     terminal_count = terminal_count + 1
@@ -497,14 +497,14 @@ end
 function GUI.populate_statistics_tab(container)
   container.clear()
   
-  local stats = global.ii_data.statistics
+  local stats = storage.ii_data.statistics
   
   container.add{type = "label", caption = {"ii-gui.statistics-title"}, style = "heading_2_label"}
   
   -- Credits
   container.add{
     type = "label",
-    caption = {"ii-gui.stat-credits", format_number(global.ii_data.credits)}
+    caption = {"ii-gui.stat-credits", format_number(storage.ii_data.credits)}
   }
   container.add{
     type = "label",
@@ -520,7 +520,7 @@ function GUI.populate_statistics_tab(container)
   }
   
   local active_count = 0
-  for _ in pairs(global.ii_data.active_orders) do
+  for _ in pairs(storage.ii_data.active_orders) do
     active_count = active_count + 1
   end
   container.add{
@@ -552,7 +552,7 @@ function GUI.populate_statistics_tab(container)
   container.add{type = "line"}.style.top_margin = 4
   container.add{type = "label", caption = {"ii-gui.unlocked-tiers"}, style = "heading_2_label"}
   
-  local tiers = global.ii_data.unlocked_order_tiers or {1}
+  local tiers = storage.ii_data.unlocked_order_tiers or {1}
   local tier_names = {"Basic", "Advanced", "Complex", "Industrial", "Mega"}
   for _, tier in ipairs(tiers) do
     container.add{
@@ -570,7 +570,7 @@ function GUI.update(player)
   -- Update credits display
   local header = main_frame.children[1]
   if header and header[GUI.NAMES.credits_label] then
-    header[GUI.NAMES.credits_label].caption = format_number(global.ii_data.credits)
+    header[GUI.NAMES.credits_label].caption = format_number(storage.ii_data.credits)
   end
   
   -- Update current tab content
@@ -685,12 +685,12 @@ function GUI.on_gui_click(event)
       local converted = 0
       for i = 1, amount do
         local cost = TradeHub.get_conversion_cost()
-        if global.ii_data.credits >= cost then
-          global.ii_data.credits = global.ii_data.credits - cost
-          global.ii_data.data_terminal_conversions = 
-            (global.ii_data.data_terminal_conversions or 0) + 1
-          global.ii_data.statistics.total_exchange_data_created = 
-            (global.ii_data.statistics.total_exchange_data_created or 0) + 1
+        if storage.ii_data.credits >= cost then
+          storage.ii_data.credits = storage.ii_data.credits - cost
+          storage.ii_data.data_terminal_conversions = 
+            (storage.ii_data.data_terminal_conversions or 0) + 1
+          storage.ii_data.statistics.total_exchange_data_created = 
+            (storage.ii_data.statistics.total_exchange_data_created or 0) + 1
           converted = converted + 1
           
           -- Give player the exchange data
