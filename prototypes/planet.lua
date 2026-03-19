@@ -15,6 +15,31 @@ data:extend({
 })
 
 -- The Exchange planet definition
+-- Custom map generation for megastructure floor (concrete-based)
+local exchange_map_gen = {
+  terrain_segmentation = 1,
+  water = 0,
+  autoplace_controls = {},
+  autoplace_settings = {
+    entity = {settings = {}},
+    tile = {
+      settings = {
+        ["ii-exchange-floor"] = {},
+        ["ii-exchange-floor-dark"] = {}
+      }
+    },
+    decorative = {settings = {}}
+  },
+  cliff_settings = {cliff_elevation_0 = 1024},  -- No cliffs
+  property_expression_names = {
+    moisture = 0,
+    aux = 0,
+    temperature = 25,
+    cliffiness = 0
+  },
+  starting_area = 1
+}
+
 data:extend({
   {
     type = "planet",
@@ -29,7 +54,7 @@ data:extend({
     magnitude = 1.0,
     order = "z[incremental]-a[exchange]",
     subgroup = "planets",
-    map_gen_settings = planet_map_gen.nauvis(),
+    map_gen_settings = exchange_map_gen,
     pollutant_type = nil,
     solar_power_in_space = 100,
     platform_procession_set = {
@@ -64,7 +89,8 @@ data:extend({
   }
 })
 
--- Exchange planet tiles (simple concrete-like surface)
+-- Exchange planet tiles - ancient megastructure flooring
+-- Main floor tile (lighter, more common)
 data:extend({
   {
     type = "tile",
@@ -76,36 +102,66 @@ data:extend({
     variants = {
       main = {
         {
-          picture = "__base__/graphics/terrain/concrete/concrete-dummy.png",
-          count = 1,
-          size = 1
+          picture = "__base__/graphics/terrain/concrete/refined-concrete.png",
+          count = 16,
+          size = 1,
+          scale = 0.5
         }
       },
       empty_transitions = true
     },
-    map_color = {r = 0.3, g = 0.4, b = 0.5},
-    walking_speed_modifier = 1.2,
-    vehicle_friction_modifier = 0.8,
+    map_color = {r = 0.35, g = 0.42, b = 0.5},
+    walking_speed_modifier = 1.3,  -- Smooth ancient flooring
+    vehicle_friction_modifier = 0.7,
     decorative_removal_probability = 1.0,
+    absorptions_per_second = {},
     minable = nil,
     mined_sound = nil,
     walking_sound = {
-      {
-        filename = "__base__/sound/walking/concrete-01.ogg",
-        volume = 0.5
+      {filename = "__base__/sound/walking/concrete-01.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-02.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-03.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-04.ogg", volume = 0.5}
+    },
+    autoplace = {
+      probability_expression = "0.7"  -- 70% of surface
+    }
+  },
+  -- Dark floor variant (accent/structure panels)
+  {
+    type = "tile",
+    name = "ii-exchange-floor-dark",
+    order = "z-b",
+    subgroup = "nauvis-tiles",
+    collision_mask = {layers = {ground_tile = true}},
+    layer = 51,
+    variants = {
+      main = {
+        {
+          picture = "__base__/graphics/terrain/concrete/refined-concrete.png",
+          count = 16,
+          size = 1,
+          scale = 0.5,
+          tint = {r = 0.6, g = 0.65, b = 0.7}
+        }
       },
-      {
-        filename = "__base__/sound/walking/concrete-02.ogg",
-        volume = 0.5
-      },
-      {
-        filename = "__base__/sound/walking/concrete-03.ogg",
-        volume = 0.5
-      },
-      {
-        filename = "__base__/sound/walking/concrete-04.ogg",
-        volume = 0.5
-      }
+      empty_transitions = true
+    },
+    map_color = {r = 0.25, g = 0.30, b = 0.38},
+    walking_speed_modifier = 1.3,
+    vehicle_friction_modifier = 0.7,
+    decorative_removal_probability = 1.0,
+    absorptions_per_second = {},
+    minable = nil,
+    mined_sound = nil,
+    walking_sound = {
+      {filename = "__base__/sound/walking/concrete-01.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-02.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-03.ogg", volume = 0.5},
+      {filename = "__base__/sound/walking/concrete-04.ogg", volume = 0.5}
+    },
+    autoplace = {
+      probability_expression = "0.3"  -- 30% of surface for variety
     }
   }
 })

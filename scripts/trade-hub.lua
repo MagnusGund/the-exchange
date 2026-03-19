@@ -35,7 +35,11 @@ TradeHub.IMPORT_MATERIALS = {
   ["processing-unit"] = {tier = 5, category = "circuit", cost_per_item = 50, prerequisites = {"ii-mega-orders"}},
   ["electric-engine-unit"] = {tier = 5, category = "intermediate", cost_per_item = 30, prerequisites = {"ii-mega-orders"}},
   ["low-density-structure"] = {tier = 5, category = "material", cost_per_item = 40, prerequisites = {"ii-mega-orders"}},
-  ["rocket-fuel"] = {tier = 5, category = "fuel", cost_per_item = 25, prerequisites = {"ii-mega-orders"}}
+  ["rocket-fuel"] = {tier = 5, category = "fuel", cost_per_item = 25, prerequisites = {"ii-mega-orders"}},
+
+  -- Tier 5: Ancient Power resources (for fusion enhancement)
+  ["fluoroketone-cold-barrel"] = {tier = 5, category = "fuel", cost_per_item = 35, prerequisites = {"ii-ancient-power"}},
+  ["fusion-power-cell"] = {tier = 5, category = "fuel", cost_per_item = 100, prerequisites = {"ii-mega-orders"}}
 }
 
 -- Initialize trade hub data structure
