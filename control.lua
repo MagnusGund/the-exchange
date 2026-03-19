@@ -118,9 +118,9 @@ local function on_custom_input(event)
     GUI.toggle(player)
   elseif event.input_name == "ii-quick-accept-order" then
     -- Quick accept first available order
-    local max_orders = global.ii_data.upgrades.order_slots or 3
+    local max_orders = storage.ii_data.upgrades.order_slots or 3
     local active_count = 0
-    for _ in pairs(global.ii_data.active_orders) do
+    for _ in pairs(storage.ii_data.active_orders) do
       active_count = active_count + 1
     end
     
@@ -160,11 +160,11 @@ remote.add_interface("the-exchange", {
   end,
   
   get_upgrades = function()
-    return global.ii_data.upgrades
+    return storage.ii_data.upgrades
   end,
   
   get_statistics = function()
-    return global.ii_data.statistics
+    return storage.ii_data.statistics
   end,
   
   unlock_all_imports = function()
@@ -181,6 +181,10 @@ remote.add_interface("the-exchange", {
   
   set_import_material = function(unit_number, material)
     return TradeHub.set_import_material(unit_number, material)
+  end,
+
+  get_active_orders = function()
+    return Orders.get_active_orders()
   end
 })
 
@@ -210,8 +214,19 @@ script.on_event(defines.events.on_entity_died, on_entity_removed, entity_filter)
 script.on_event(defines.events.script_raised_destroy, on_entity_removed, entity_filter)
 
 -- Tick processing
-local tick_rate = settings.global["ii-import-tick-rate"] and settings.global["ii-import-tick-rate"].value or 30
-script.on_nth_tick(tick_rate, on_tick_processing)
+local function register_tick_handler()
+  local tick_rate = settings.global["ii-import-tick-rate"] and settings.global["ii-import-tick-rate"].value or 30
+  script.on_nth_tick(nil) -- clear all nth_tick handlers
+  script.on_nth_tick(tick_rate, on_tick_processing)
+end
+register_tick_handler()
+
+-- Handle runtime settings changes (e.g. tick rate)
+script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
+  if event.setting == "ii-import-tick-rate" then
+    register_tick_handler()
+  end
+end)
 
 -- Research events
 script.on_event(defines.events.on_research_finished, on_research_finished)

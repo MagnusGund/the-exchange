@@ -82,7 +82,7 @@ function Upgrades.get_cost(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return nil end
   
-  local current_level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  local current_level = storage.ii_data.upgrade_levels[upgrade_name] or 0
   if current_level >= def.max_level then return nil end
   
   return math.floor(def.base_cost * (def.cost_scaling ^ current_level))
@@ -90,7 +90,7 @@ end
 
 -- Get current upgrade level
 function Upgrades.get_level(upgrade_name)
-  return global.ii_data.upgrade_levels[upgrade_name] or 0
+  return storage.ii_data.upgrade_levels[upgrade_name] or 0
 end
 
 -- Get upgrade effect value
@@ -98,7 +98,7 @@ function Upgrades.get_effect(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return 0 end
   
-  local level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  local level = storage.ii_data.upgrade_levels[upgrade_name] or 0
   return level * def.effect_per_level
 end
 
@@ -107,7 +107,7 @@ function Upgrades.purchase(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return false, "Invalid upgrade" end
   
-  local current_level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  local current_level = storage.ii_data.upgrade_levels[upgrade_name] or 0
   if current_level >= def.max_level then
     return false, "Already at max level"
   end
@@ -121,7 +121,7 @@ function Upgrades.purchase(upgrade_name)
   end
   
   -- Apply upgrade
-  global.ii_data.upgrade_levels[upgrade_name] = current_level + 1
+  storage.ii_data.upgrade_levels[upgrade_name] = current_level + 1
   Upgrades.apply_upgrade(upgrade_name)
   
   return true
@@ -132,27 +132,27 @@ function Upgrades.apply_upgrade(upgrade_name)
   local def = Upgrades.DEFINITIONS[upgrade_name]
   if not def then return end
   
-  local level = global.ii_data.upgrade_levels[upgrade_name] or 0
+  local level = storage.ii_data.upgrade_levels[upgrade_name] or 0
   local effect = level * def.effect_per_level
   
   if upgrade_name == "import_rate" then
-    global.ii_data.upgrades.import_rate = 1.0 + effect
+    storage.ii_data.upgrades.import_rate = 1.0 + effect
     
   elseif upgrade_name == "order_slots" then
-    global.ii_data.upgrades.order_slots = 3 + level
+    storage.ii_data.upgrades.order_slots = 3 + level
     
   elseif upgrade_name == "order_reward_bonus" then
-    global.ii_data.upgrades.order_reward_bonus = 1.0 + effect
+    storage.ii_data.upgrades.order_reward_bonus = 1.0 + effect
 
   elseif upgrade_name == "data_conversion_efficiency" then
-    global.ii_data.upgrades.data_conversion_efficiency = effect
+    storage.ii_data.upgrades.data_conversion_efficiency = effect
   end
 end
 
 -- Apply all upgrades (called on game load)
 function Upgrades.apply_all()
   for upgrade_name, _ in pairs(Upgrades.DEFINITIONS) do
-    if global.ii_data.upgrade_levels[upgrade_name] then
+    if storage.ii_data.upgrade_levels[upgrade_name] then
       Upgrades.apply_upgrade(upgrade_name)
     end
   end
