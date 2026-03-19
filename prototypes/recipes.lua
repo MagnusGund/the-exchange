@@ -1,4 +1,4 @@
--- Incremental Industrialist - Recipes
+-- The Exchange - Recipes
 
 -- Data Matrix recipe (Exchange Data + electronic circuits)
 data:extend({

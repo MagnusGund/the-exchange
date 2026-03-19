@@ -1,4 +1,4 @@
--- Incremental Industrialist - Data Terminal
+-- The Exchange - Data Terminal
 -- Converts credits to Exchange Data with scaling cost
 
 data:extend({

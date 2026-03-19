@@ -1,4 +1,4 @@
--- Incremental Industrialist - Import Chest
+-- The Exchange - Import Chest
 -- Generates materials from credits, outputs to belts
 
 data:extend({

@@ -1,4 +1,4 @@
--- Incremental Industrialist - Toolbar Shortcuts
+-- The Exchange - Toolbar Shortcuts
 
 data:extend({
   -- Main GUI toggle shortcut

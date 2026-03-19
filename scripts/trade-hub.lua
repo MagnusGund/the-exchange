@@ -1,4 +1,4 @@
--- Incremental Industrialist - Trade Hub System
+-- The Exchange - Trade Hub System
 -- Manages import/export chests and material generation
 
 local TradeHub = {}
@@ -223,17 +223,19 @@ end
 -- Process data terminals
 function TradeHub.process_data_terminals()
   local base_cost = settings.global["ii-data-terminal-conversion-rate"].value or 100
-  local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.05
-  
+  local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.02
+
   for unit_number, terminal_data in pairs(global.ii_data.data_terminals) do
     if terminal_data.entity and terminal_data.entity.valid and terminal_data.active then
       local entity = terminal_data.entity
       local output = entity.get_output_inventory()
-      
+
       if output and output.can_insert({name = "ii-exchange-data", count = 1}) then
-        -- Calculate current cost
+        -- Calculate current cost (apply conversion efficiency as multiplicative discount)
         local conversions = global.ii_data.data_terminal_conversions or 0
-        local cost = math.floor(base_cost * (scaling ^ conversions))
+        local efficiency_level = global.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
+        local efficiency_discount = 0.97 ^ efficiency_level -- ~3% cheaper per level, multiplicative
+        local cost = math.max(1, math.floor(base_cost * (scaling ^ conversions) * efficiency_discount))
         
         if global.ii_data.credits >= cost then
           global.ii_data.credits = global.ii_data.credits - cost
@@ -254,9 +256,11 @@ end
 -- Get current conversion cost for data terminal
 function TradeHub.get_conversion_cost()
   local base_cost = settings.global["ii-data-terminal-conversion-rate"].value or 100
-  local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.05
+  local scaling = settings.global["ii-data-terminal-scaling-factor"].value or 1.02
   local conversions = global.ii_data.data_terminal_conversions or 0
-  return math.floor(base_cost * (scaling ^ conversions))
+  local efficiency_level = global.ii_data.upgrade_levels["data_conversion_efficiency"] or 0
+  local efficiency_discount = 0.97 ^ efficiency_level
+  return math.max(1, math.floor(base_cost * (scaling ^ conversions) * efficiency_discount))
 end
 
 -- Add credits
