@@ -66,7 +66,7 @@ Export Orders → Credits → Exchange Data → Data Matrix → Commerce Science
 
 ## Key Data Structures
 
-### global.ii_data
+### storage.ii_data
 ```lua
 {
   credits = 0,
@@ -85,7 +85,7 @@ Export Orders → Credits → Exchange Data → Data Matrix → Commerce Science
 
 - **Prototypes:** Prefix with `ii-` (e.g., `ii-import-chest`)
 - **Locale keys:** Prefix with `ii-` (e.g., `ii-gui.title`)
-- **Global data:** Use `global.ii_data` as namespace
+- **Storage data:** Use `storage.ii_data` as namespace (Factorio 2.0 uses `storage` not `global`)
 - **GUI elements:** Prefix with `ii_` (e.g., `ii_main_frame`)
 
 ## Testing Commands

@@ -67,7 +67,7 @@ end
 
 -- Get available order templates for player's unlocked tiers
 function Orders.get_available_templates()
-  local unlocked_tiers = global.ii_data.unlocked_order_tiers or {1}
+  local unlocked_tiers = storage.ii_data.unlocked_order_tiers or {1}
   local available = {}
   
   for _, template in ipairs(Orders.ORDER_TEMPLATES) do
@@ -110,7 +110,7 @@ function Orders.generate_order(preferred_tier, preferred_size)
   local size_tier = Orders.SIZE_TIERS[size_index]
   
   -- Calculate scaled amount and reward
-  local item_progress = global.ii_data.order_progress[template.item] or 0
+  local item_progress = storage.ii_data.order_progress[template.item] or 0
   local progress_scaling = 1 + (item_progress * 0.1) -- 10% increase per completed order of this type
   
   local amount = math.floor(template.base_amount * size_tier.multiplier * progress_scaling)
@@ -134,10 +134,10 @@ end
 
 -- Accept an order (add to active orders)
 function Orders.accept_order(order)
-  local max_orders = global.ii_data.upgrades.order_slots or 3
+  local max_orders = storage.ii_data.upgrades.order_slots or 3
   local active_count = 0
   
-  for _ in pairs(global.ii_data.active_orders) do
+  for _ in pairs(storage.ii_data.active_orders) do
     active_count = active_count + 1
   end
   
@@ -145,33 +145,33 @@ function Orders.accept_order(order)
     return false, "Maximum active orders reached"
   end
   
-  global.ii_data.active_orders[order.id] = order
+  storage.ii_data.active_orders[order.id] = order
   return true
 end
 
 -- Complete an order
 function Orders.complete_order(order_id)
-  local order = global.ii_data.active_orders[order_id]
+  local order = storage.ii_data.active_orders[order_id]
   if not order then return false end
 
   -- Award credits (apply order reward bonus if upgraded)
   local TradeHub = require("scripts.trade-hub")
-  local reward_multiplier = global.ii_data.upgrades.order_reward_bonus or 1.0
+  local reward_multiplier = storage.ii_data.upgrades.order_reward_bonus or 1.0
   local final_reward = math.floor(order.reward * reward_multiplier)
   TradeHub.add_credits(final_reward)
   
   -- Update statistics
-  global.ii_data.statistics.total_orders_completed = 
-    global.ii_data.statistics.total_orders_completed + 1
+  storage.ii_data.statistics.total_orders_completed = 
+    storage.ii_data.statistics.total_orders_completed + 1
   
   -- Update item progress
-  global.ii_data.order_progress[order.item] = 
-    (global.ii_data.order_progress[order.item] or 0) + 1
+  storage.ii_data.order_progress[order.item] = 
+    (storage.ii_data.order_progress[order.item] or 0) + 1
   
   -- Move to completed orders
   order.completed_tick = game.tick
-  global.ii_data.completed_orders[order_id] = order
-  global.ii_data.active_orders[order_id] = nil
+  storage.ii_data.completed_orders[order_id] = order
+  storage.ii_data.active_orders[order_id] = nil
   
   -- Notify players
   for _, player in pairs(game.players) do
@@ -183,7 +183,7 @@ end
 
 -- Cancel an order
 function Orders.cancel_order(order_id)
-  local order = global.ii_data.active_orders[order_id]
+  local order = storage.ii_data.active_orders[order_id]
   if not order then return false end
   
   -- Return partial credit for delivered items (50%)
@@ -195,28 +195,28 @@ function Orders.cancel_order(order_id)
     end
   end
   
-  global.ii_data.active_orders[order_id] = nil
+  storage.ii_data.active_orders[order_id] = nil
   return true
 end
 
 -- Get active orders
 function Orders.get_active_orders()
-  return global.ii_data.active_orders
+  return storage.ii_data.active_orders
 end
 
 -- Get order by ID
 function Orders.get_order(order_id)
-  return global.ii_data.active_orders[order_id]
+  return storage.ii_data.active_orders[order_id]
 end
 
 -- Get completed orders count for an item
 function Orders.get_item_progress(item_name)
-  return global.ii_data.order_progress[item_name] or 0
+  return storage.ii_data.order_progress[item_name] or 0
 end
 
 -- Unlock a new order tier
 function Orders.unlock_tier(tier)
-  local tiers = global.ii_data.unlocked_order_tiers
+  local tiers = storage.ii_data.unlocked_order_tiers
   for _, t in ipairs(tiers) do
     if t == tier then
       return false -- Already unlocked
@@ -229,13 +229,13 @@ end
 
 -- Get current unlocked tiers
 function Orders.get_unlocked_tiers()
-  return global.ii_data.unlocked_order_tiers
+  return storage.ii_data.unlocked_order_tiers
 end
 
 -- Get max unlocked tier
 function Orders.get_max_tier()
   local max = 1
-  for _, tier in ipairs(global.ii_data.unlocked_order_tiers) do
+  for _, tier in ipairs(storage.ii_data.unlocked_order_tiers) do
     if tier > max then max = tier end
   end
   return max
